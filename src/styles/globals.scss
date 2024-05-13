@@ -1,0 +1,16 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  @apply bg-[#242424] text-[#EBE9E8];
+}
+
+// * {
+//   outline: 1px solid red;
+//   background-color: rgba(255, 0, 0, 0.1) !important;
+// }
+
+input {
+  @apply h-8 w-8 rounded-xl;
+}

@@ -1,10 +1,159 @@
+import { useEffect, useState } from "react";
+
 import Layout from "@/Layout";
 import DailyProgress from "@/components/DailyProgress";
 
+import { Slider } from "@mui/material";
+
+import { IoIosArrowForward } from "react-icons/io";
+import ProgressGraph from "@/components/ProgressGraph";
+
+const goal1Svg = (
+  <svg
+    width="32"
+    height="32"
+    viewBox="0 0 32 32"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <rect width="32" height="32" rx="6.4" fill="#3D3D3D" />
+    <path
+      d="M16 10.583C15.001 10.583 14.2 11.269 14.2 12.1246C14.2 12.9801 15.001 13.6661 16 13.6661C16.999 13.6661 17.8 12.9801 17.8 12.1246C17.8 11.269 16.999 10.583 16 10.583ZM25 7.5V11.3538H23.2V9.81229H8.8V11.3538H7V7.5H8.8V9.04152H23.2V7.5H25ZM18.7 15.408V24.4568H16.9V20.603H15.1V24.4568H13.3V15.408C11.437 14.5679 10.15 12.8953 10.15 10.9684V10.583H11.95V10.9684C11.95 12.8953 13.75 14.4369 16 14.4369C18.25 14.4369 20.05 12.8953 20.05 10.9684V10.583H21.85V10.9684C21.85 12.8953 20.563 14.5679 18.7 15.408Z"
+      fill="#9E4CB8"
+    />
+  </svg>
+);
+
+const goal2Svg = (
+  <svg
+    width="32"
+    height="32"
+    viewBox="0 0 32 32"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <rect width="32" height="32" rx="6.4" fill="#3D3D3D" />
+    <path
+      d="M22.4525 15.7002C22.2084 15.4002 21.9111 15.1402 21.6351 14.8802C20.9239 14.2802 20.1171 13.8502 19.4377 13.2202C17.8559 11.7601 17.5056 9.35005 18.5141 7.5C17.5056 7.73001 16.6245 8.25002 15.8708 8.82004C13.1213 10.9001 12.0385 14.5702 13.3336 17.7203C13.3761 17.8203 13.4185 17.9203 13.4185 18.0503C13.4185 18.2703 13.2593 18.4703 13.047 18.5503C12.8028 18.6503 12.548 18.5903 12.3464 18.4303C12.2827 18.3803 12.2402 18.3303 12.1977 18.2603C10.9982 16.8303 10.8071 14.7802 11.6139 13.1402C9.84104 14.5002 8.87501 16.8003 9.01301 18.9703C9.07671 19.4703 9.1404 19.9704 9.32087 20.4704C9.46949 21.0704 9.75611 21.6704 10.0746 22.2004C11.2211 23.9305 13.2062 25.1705 15.34 25.4205C17.6118 25.6905 20.0428 25.3005 21.7837 23.8205C23.7264 22.1604 24.4058 19.5003 23.4079 17.2203L23.2699 16.9603C23.047 16.5003 22.4525 15.7002 22.4525 15.7002ZM19.098 22.0004C18.8007 22.2404 18.3124 22.5004 17.9302 22.6004C16.7413 23.0004 15.5523 22.4404 14.8517 21.7804C16.1149 21.5004 16.8687 20.6204 17.0916 19.7303C17.272 18.9303 16.9323 18.2703 16.7943 17.5003C16.667 16.7603 16.6882 16.1302 16.9748 15.4402C17.1765 15.8202 17.3888 16.2002 17.6436 16.5003C18.461 17.5003 19.7455 17.9403 20.0215 19.3003C20.064 19.4403 20.0852 19.5803 20.0852 19.7303C20.1171 20.5504 19.7349 21.4504 19.098 22.0004Z"
+      fill="#DE6C53"
+    />
+  </svg>
+);
+
+const goal3Svg = (
+  <svg
+    width="32"
+    height="33"
+    viewBox="0 0 32 33"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <rect y="0.5" width="32" height="32" rx="6.4" fill="#3D3D3D" />
+    <path
+      d="M15.0853 16.7558C15.5088 17.8642 15.4637 19.0175 14.1932 19.4771C11.5801 20.4412 10.9944 17.9092 10.9583 17.7831L15.0853 16.7558ZM10.5528 16.026L14.4455 15.0618C14.2743 14.1157 14.5356 13.1696 14.5356 12.0522C14.5356 10.5384 13.3372 7.57389 11.4269 8.05146C9.24627 8.59211 8.93089 11.016 9.01199 12.1874C9.12012 13.3588 10.4898 15.8638 10.5528 16.026ZM21.4919 24.0816C21.4649 24.2167 20.8702 26.7397 18.2571 25.7846C16.9955 25.3161 16.9415 24.1627 17.365 23.0544L21.4919 24.0816ZM23.4292 18.4949C23.5193 17.3235 23.213 14.8906 21.0234 14.35C19.1221 13.8544 17.9237 16.8369 17.9237 18.3598C17.9237 19.4681 18.176 20.4142 18.0228 21.3603L21.8974 22.3245C21.9695 22.1623 23.3301 19.6573 23.4292 18.4949Z"
+      fill="#81B47D"
+    />
+  </svg>
+);
+
+const goal4Svg = (
+  <svg
+    width="32"
+    height="32"
+    viewBox="0 0 32 32"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <rect width="32" height="32" rx="6.4" fill="#3D3D3D" />
+    <path
+      d="M13.3247 9.80127C13.1089 10.4713 12.9993 11.1711 12.9999 11.875C12.9999 15.6029 16.0221 18.625 19.7499 18.625C20.67 18.6261 21.5805 18.4385 22.4252 18.0738C21.5503 20.7876 19.0044 22.75 15.9999 22.75C12.2721 22.75 9.24994 19.7279 9.24994 16C9.24994 13.2224 10.9273 10.837 13.3247 9.80127Z"
+      fill="#63A7A7"
+      stroke="#63A7A7"
+      stroke-width="1.5"
+      stroke-linejoin="round"
+    />
+    <path
+      d="M18.8724 10.75H22.3749L18.6249 13.75H22.3749"
+      stroke="#63A7A7"
+      stroke-width="1.5"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    />
+  </svg>
+);
+
+const goal5Svg = (
+  <svg
+    width="32"
+    height="33"
+    viewBox="0 0 32 33"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <rect y="0.312988" width="32" height="32" rx="6.4" fill="#3D3D3D" />
+    <g clip-path="url(#clip0_1_757)">
+      <path
+        d="M16.1833 8.31785C16.159 8.12435 15.8413 8.12435 15.8179 8.31785C15.0232 14.7142 10.9597 16.0327 10.9597 20.4787C10.9597 23.2264 13.2673 25.453 16.0006 25.453C18.733 25.453 21.0406 23.2255 21.0406 20.4787C21.0406 16.0327 16.978 14.7142 16.1833 8.31785ZM15.4156 15.3892C15.3625 15.5863 15.3049 15.7888 15.2455 15.9994C14.8846 17.281 14.4751 18.7345 14.4751 20.4148C14.4751 21.3256 13.9369 21.6487 13.4347 21.6487C13.2974 21.6481 13.1617 21.6205 13.0351 21.5674C12.9086 21.5143 12.7937 21.4369 12.6971 21.3394C12.6005 21.242 12.524 21.1265 12.4721 20.9995C12.4201 20.8725 12.3937 20.7365 12.3943 20.5993C12.3943 18.613 13.3501 17.3152 14.1943 16.1713C14.4598 15.8131 14.7091 15.4738 14.9116 15.1363C15.0043 14.9815 15.2536 14.9887 15.367 15.1417C15.4201 15.2137 15.4381 15.3055 15.4156 15.3892Z"
+        fill="#5A92CB"
+      />
+    </g>
+    <defs>
+      <clipPath id="clip0_1_757">
+        <rect
+          width="18"
+          height="18"
+          fill="white"
+          transform="translate(7.00049 7.81299)"
+        />
+      </clipPath>
+    </defs>
+  </svg>
+);
+
 export default function Page1() {
+  const [goals, setGoals] = useState([
+    {
+      title: "Workout for 20 mins",
+      svg: goal1Svg,
+      accentColor: "#9E4CB8",
+      checked: false,
+    },
+    {
+      title: "Read book for 15 mins",
+      svg: goal2Svg,
+      accentColor: "#DE6C53",
+      checked: false,
+    },
+    {
+      title: "30 mins walk",
+      svg: goal3Svg,
+      accentColor: "#81B47D",
+      checked: false,
+    },
+    {
+      title: "Sleep at 11 sharp",
+      svg: goal4Svg,
+      accentColor: "#63A7A7",
+      checked: false,
+    },
+    {
+      title: "Drink 3L water",
+      svg: goal5Svg,
+      accentColor: "#5A92CB",
+      checked: false,
+    },
+  ]);
+
+  const [completed, setCompleted] = useState(0);
+  const [total, setTotal] = useState(goals.length);
+
+  useEffect(() => {
+    setCompleted(goals.filter((goal) => goal.checked).length);
+  }, [goals]);
+
   return (
     <Layout>
-      <DailyProgress />
+      <DailyProgress completed={completed} total={total} />
       <div>
         <div className="w-full h-10 py-10 flex flex-row justify-between items-center tracking-wide">
           <h1>Today's Goals</h1>
@@ -44,14 +193,67 @@ export default function Page1() {
           </svg>
         </div>
         <div className="tracking-wide">
-          <div className="h-16 w-full bg-[#282828] rounded-xl p-4 flex flex-row justify-between items-center gap-4">
-            <div>Icond</div>
-            <p className="w-full">Workout for 20 mins</p>
-            <input type="checkbox" className="accent" />
+          <div className="flex flex-col gap-2">
+            {goals.map((goal, index) => (
+              <div className="h-16 w-full bg-[#282828] rounded-xl p-4 flex flex-row justify-between items-center gap-4">
+                {goal.svg}
+                <p className="w-full">{goal.title}</p>
+                <input
+                  type="checkbox"
+                  className={`accent-[${goal.accentColor}]`}
+                  checked={goal.checked}
+                  onChange={(e) => {
+                    const newGoals = [...goals];
+                    newGoals[index].checked = e.target.checked;
+                    setGoals(newGoals);
+                  }}
+                />
+              </div>
+            ))}
+          </div>
+          <div className="bg-[#D15439] h-12 w-full rounded-3xl p-1 mt-4 relative flex flex-row justify-end items-center">
+            <Slider
+              className="absolute w-auto left-6 right-6"
+              sx={{
+                width: "0",
+              }}
+              onChange={(e, value) => {
+                if (value >= 90) {
+                  setGoals(
+                    goals.map((goal) => ({
+                      ...goal,
+                      checked: true,
+                    }))
+                  );
+                } else {
+                  setGoals(
+                    goals.map((goal) => ({
+                      ...goal,
+                      checked: false,
+                    }))
+                  );
+                }
+              }}
+            />
+            <p className="mr-10">Swipe to track all</p>
+            <div className="p-2 flex flex-row">
+              <IoIosArrowForward className="opacity-30" />
+              <IoIosArrowForward className="opacity-60" />
+              <IoIosArrowForward className="opacity-100" />
+            </div>
           </div>
         </div>
       </div>
-      <div>Graph</div>
+      {/* <div>
+        {goals.length > 0 ? (
+          <ProgressGraph data={goals} />
+        ) : (
+          <div className="w-full h-96 flex flex-row justify-center items-center">
+            <p>No data available</p>
+          </div>
+        )}
+      </div>
+      */}
     </Layout>
   );
 }

@@ -14,3 +14,13 @@ body {
 input {
   @apply h-8 w-8 rounded-xl;
 }
+
+.MuiSlider-thumb {
+  @apply w-10 h-10 bg-white text-[#D15439];
+  content: "Track";
+}
+
+
+.MuiSlider-rail, .MuiSlider-track {
+  @apply h-1 bg-transparent border-none;
+}
